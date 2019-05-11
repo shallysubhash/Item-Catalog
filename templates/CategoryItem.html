@@ -1,0 +1,15 @@
+﻿{% extends "layout.html" %}
+
+{% set pagename = 'home' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        {{Item.description}}
+    </div>
+</div>
+  {% if 'username' in session  %}
+<a href="{{url_for('editItem', item_id = Item.id)}}">Edit</a>
+<a href="{{url_for('deleteItem', item_id = Item.id)}}">Delete</a>
+    {% endif %}
+    {% endblock %}

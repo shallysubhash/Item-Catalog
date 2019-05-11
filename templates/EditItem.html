@@ -1,0 +1,37 @@
+﻿{% extends "layout.html" %}
+
+{% set pagename = 'home' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <form method="post">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" maxlength="50" class="form-control" name="name" placeholder="Name" value="{{Item.name}}">
+                <label for="description">Description:</label>
+                <textarea class="form-control" maxlength="500" rows="3" name="description" placeholder="Description">{{Item.description}}</textarea>
+
+                <select class="form-control" name="category">
+                    {% for category in categories %}
+                    {% if Item and Item.Category_id == category.id %}
+                    <option id="{{category.id}}" value="{{category.id}}" selected>{{category.name}}</option>
+                    {% else %}
+                    <option id="{{category.id}}" value="{{category.id}}">{{category.name}}</option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+                {% if 'username' in session  %}
+                <input type="submit" value="Save" class="btn btn-default">
+                <a href="{{ url_for('showcatalogs') }}" id="cancel" name="cancel" class="btn btn-default">Cancel</a>
+                {% endif %}
+            </div>
+        </form>
+
+    </div>
+
+</div>
+  
+
+
+        {% endblock %}
