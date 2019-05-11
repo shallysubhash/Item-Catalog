@@ -16,6 +16,10 @@ Shows the items details of particular category
 /Items/JSON
 Shows the information of all the items
 
+## Setting up the database
+- run the command python3 database_setup.py
+- run the command python3 Insertdata.py
+
 ## Running the applicaion with Vagrant
 - Clone the repository
 - Launch the Vagrant VM with the command vagrant up
