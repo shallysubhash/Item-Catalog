@@ -57,7 +57,8 @@ def gdisconnect():
     print('In gdisconnect access token is %s', access_token)
     print('User name is: ')
     print(login_session['username'])
-    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' \
+          % login_session['access_token']
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
     print('result is ')
@@ -72,7 +73,9 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
     else:
-        response = make_response(json.dumps('Failed to revoke token for given user.', 400))
+        response = make_response(json.dumps('Failed to'
+                                            'revoke token for'
+                                            'given user.', 400))
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -129,7 +132,8 @@ def gconnect():
     stored_access_token = login_session.get('access_token')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
+        response = make_response(json.dumps('Current '
+                                            'user is already connected.'),
                                  200)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -155,7 +159,9 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px; height: 300px;'
+    'border-radius: 150px;-webkit-border-radius:'
+    '150px;-moz-border-radius: 150px;"> '
     flash("you are now logged in as %s" % login_session['username'])
     print("done!")
     return output
@@ -187,22 +193,28 @@ def ShowItem(item_id):
 @app.route('/EditItem/<int:item_id>', methods=['GET', 'POST'])
 def editItem(item_id):
     singleItem = session.query(Item).filter_by(id=item_id).one()
+    if singleItem.user_name != login_session['username']:
+        return "<script>{alert('Not authorised');}</script>"
     categories = session.query(Category).order_by(Category.name)
     if request.method == 'POST':
         singleItem.name = request.form['name']
         singleItem.description = request.form['description']
         singleItem.category_id = request.form['category']
+        singleItem.user_name = login_session['username']
         session.add(singleItem)
         session.commit()
         return redirect(
             url_for('showcatalogs'))
     else:
-        return render_template('EditItem.html', Item=singleItem, categories=categories)
+        return render_template('EditItem.html',
+                               Item=singleItem, categories=categories)
 
 
 @app.route('/DeleteItem/<int:item_id>', methods=['GET', 'POST'])
 def deleteItem(item_id):
     item = session.query(Item).filter_by(id=item_id).one()
+    if item.user_name != login_session['username']:
+        return "<script>{alert('Not authorised');}</script>"
     if request.method == 'POST':
         session.delete(item)
         session.commit()
@@ -217,7 +229,9 @@ def NewItem():
     categories = session.query(Category).order_by(Category.name)
     if request.method == 'POST':
         ItemToAdd = Item(Category_id=request.form['category'],
-                         description=request.form['description'], name=request.form['name'])
+                         description=request.form['description'],
+                         name=request.form['name'],
+                         user_name=login_session['username'])
         session.add(ItemToAdd)
         session.commit()
         return redirect(
@@ -228,18 +242,24 @@ def NewItem():
 # JSON to view catogories
 @app.route('/catogories/JSON')
 def categoriesJSON():
+    if 'username' not in login_session:
+        return redirect('/login')
     categories = session.query(Category).order_by(Category.name)
     return jsonify(categories=[c.serialize for c in categories])
 
 # to get items of a single category
 @app.route('/catogoryItems/<int:category_id>/JSON')
 def CategoryItemsJSON(category_id):
+    if 'username' not in login_session:
+        return redirect('/login')
     CategoryItems = session.query(Item).filter_by(Category_id=category_id)
     return jsonify(CategoryItems=[c.serialize for c in CategoryItems])
 
 # to get all items
 @app.route('/Items/JSON')
 def ItemsJSON():
+    if 'username' not in login_session:
+        return redirect('/login')
     Items = session.query(Item).order_by(Item.name)
     return jsonify(Items=[c.serialize for c in Items])
 

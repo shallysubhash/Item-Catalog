@@ -31,7 +31,8 @@ class Item(Base):
     id = Column(Integer, primary_key = True)
     description = Column(String(250))
     Category_id = Column(Integer,ForeignKey('Category.id'))
-    category  = relationship(Category) 
+    category  = relationship(Category, cascade="save-update, merge, delete") 
+    user_name = Column(String(250), nullable=False)
     
 
 #We added this serialize function to be able to send JSON objects in a serializable format
